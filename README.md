@@ -1,20 +1,20 @@
-# Poc de instrumentação de logs com .NET
+# .NET Log Instrumentation POC
 
-Implementação para logging automático em aplicações .NET usando **Interceptor(Castle DynamicProxy)** e **Attributes personalizados**.
+Implementation for automatic logging in .NET applications using **Interceptor (Castle DynamicProxy)** and **custom Attributes**.
 
-## 📋 Características
+## 📋 Features
 
-- ✅ **Logging declarativo** usando attributes
-- ✅ **Interceptação transparente** via Castle DynamicProxy
-- ✅ **Integração natural** com Dependency Injection
-- ✅ **Suporte completo** a métodos síncronos e assíncronos
-- ✅ **Configuração flexível** de lifetime dos serviços
-- ✅ **Attributes compatíveis na implementação e/ou interface**
-- ✅ **Logging estruturado** com Serilog
+- ✅ **Declarative logging** using attributes
+- ✅ **Transparent interception** via Castle DynamicProxy
+- ✅ **Natural integration** with Dependency Injection
+- ✅ **Full support** for synchronous and asynchronous methods
+- ✅ **Flexible configuration** of service lifetimes
+- ✅ **Compatible attributes** on implementation and/or interface
+- ✅ **Structured logging** with Serilog
 
-## 📖 Como Usar
+## 📖 How to Use
 
-### 1. Defina os Attributes nos métodos da implementação
+### 1. Define Attributes on implementation methods
 
 ```csharp
 public class OrderService : IOrderService
@@ -23,7 +23,7 @@ public class OrderService : IOrderService
     [LogEntryExit]
     public async Task<Order> GetOrderAsync(int orderId)
     {
-        // Sua lógica aqui
+        // Your logic here
         return new Order { Id = orderId };
     }
     
@@ -31,48 +31,48 @@ public class OrderService : IOrderService
     [LogError("Payment processing failed")]
     public async Task ProcessOrderAsync(Order order)
     {
-        // Sua lógica aqui
+        // Your logic here
     }
 }
 ```
 
-### 2. Configure a Injeção de Dependência
+### 2. Configure Dependency Injection
 
 ```csharp
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
-        // Registrar serviços com interceptação
+        // Register services with interception
         services.AddIntercepted<IOrderService, OrderService>();
         services.AddIntercepted<ICalculatorService, CalculatorService>();
     })
     .Build();
 ```
 
-### 3. Use normalmente via Dependency Injection
+### 3. Use normally via Dependency Injection
 
 ```csharp
 public class OrderController
 {
     private readonly IOrderService _orderService;
     
-    public OrderController(IOrderService orderService) // Já instrumentado!
+    public OrderController(IOrderService orderService) // Already instrumented!
     {
         _orderService = orderService;
     }
     
     public async Task<IActionResult> GetOrder(int id)
     {
-        var order = await _orderService.GetOrderAsync(id); // Logging automático
+        var order = await _orderService.GetOrderAsync(id); // Automatic logging
         return Ok(order);
     }
 }
 ```
 
-## 🏷️ Attributes Disponíveis
+## 🏷️ Available Attributes
 
 ### `[LogExecutionTime]`
-Mede e registra o tempo de execução do método.
+Measures and logs method execution time.
 
 ```csharp
 [LogExecutionTime("Custom description")]
@@ -80,7 +80,7 @@ public async Task ProcessDataAsync() { }
 ```
 
 ### `[LogError]`
-Personaliza mensagens de erro quando exceções ocorrem.
+Customizes error messages when exceptions occur.
 
 ```csharp
 [LogError("Custom error message")]
@@ -88,7 +88,7 @@ public void RiskyOperation() { }
 ```
 
 ### `[LogEntryExit]`
-Registra entrada e saída dos métodos.
+Logs method entry and exit.
 
 ```csharp
 [LogEntryExit]
@@ -98,20 +98,20 @@ public void ImportantMethod() { }
 ## 🔧 Extension Methods
 
 ### `AddIntercepted<TInterface, TImplementation>(ServiceLifetime)`
-Para controle específico do ciclo de vida. Parâmetro opcional, por padrão `Scoped`.
+For specific lifecycle control. Optional parameter, defaults to `Scoped`.
 
 ```csharp
-// Singleton para cache
+// Singleton for cache
 services.AddIntercepted<ICacheService, CacheService>(ServiceLifetime.Singleton);
 
-// Scoped para serviços em geral
+// Scoped for general services
 services.AddIntercepted<IOrderService, OrderService>(ServiceLifetime.Scoped);
 
-// Transient para processamento isolado
+// Transient for isolated processing
 services.AddIntercepted<IEmailSender, EmailSender>(ServiceLifetime.Transient);
 ```
 
-## 📊 Exemplo de Saída
+## 📊 Sample Output
 
 ```
 [14:23:45 INF] [ENTRY] Entering OrderService.GetOrderAsync
@@ -125,7 +125,7 @@ services.AddIntercepted<IEmailSender, EmailSender>(ServiceLifetime.Transient);
     System.InvalidOperationException: Insufficient funds
 ```
 
-## 🏗️ Arquitetura
+## 🏗️ Architecture
 
 ```
 ┌─────────────────┐    ┌──────────────────┐     ┌─────────────────┐
@@ -142,36 +142,36 @@ services.AddIntercepted<IEmailSender, EmailSender>(ServiceLifetime.Transient);
                        └───────────────────┘
 ```
 
-## 🎯 Casos de Uso
+## 🎯 Use Cases
 
-- **APIs REST**: Logging automático de controllers e serviços
-- **Aplicações Console**: Monitoramento de performance
-- **Background Services**: Rastreamento de processamento
-- **Microservices**: Observabilidade distribuída
-- **Aplicações Enterprise**: Auditoria e debugging
+- **REST APIs**: Automatic logging for controllers and services
+- **Console Applications**: Performance monitoring
+- **Background Services**: Processing tracking
+- **Microservices**: Distributed observability
+- **Enterprise Applications**: Auditing and debugging
 
-## 📝 Exemplo Completo
+## 📝 Complete Example
 
-Veja o código fonte completo no arquivo principal do projeto para um exemplo funcional com:
+See the complete source code in the main project file for a functional example with:
 
-- Múltiplos serviços com diferentes attributes
-- Configuração completa de DI
-- Tratamento de erros
-- Métodos síncronos e assíncronos
-- Integração com Serilog
+- Multiple services with different attributes
+- Complete DI configuration
+- Error handling
+- Synchronous and asynchronous methods
+- Serilog integration
 
-## 🤝 Colaboradores
+## 🤝 Contributors
 
-- **[Pedro Neto](https://github.com/13pneto)** - Colaborador no desenvolvimento desta solução
+- **[Pedro Neto](https://github.com/13pneto)** - Collaborator in developing this solution
 
 ## 🆘 Troubleshooting
 
-### Problema: Attributes não são encontrados
-**Solução**: Certifique-se de que os attributes estão na implementação ou na interface. O interceptor foi configurado para buscar em ambos os locais.
+### Issue: Attributes are not found
+**Solution**: Make sure attributes are on the implementation or interface. The interceptor is configured to search in both locations.
 
-### Problema: Logging não funciona
-**Solução**: Verifique se você está usando `AddIntercepted` em vez do `AddScoped` padrão.
+### Issue: Logging doesn't work
+**Solution**: Verify you're using `AddIntercepted` instead of the standard `AddScoped`.
 
 ---
 
-💡 **Dica**: Este padrão é especialmente útil para aplicações enterprise onde você precisa de logging consistente sem poluir o código de negócio com lógica de instrumentação.
+💡 **Tip**: This pattern is especially useful for enterprise applications where you need consistent logging without polluting business code with instrumentation logic.
